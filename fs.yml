@@ -1,0 +1,32 @@
+- hosts: server_node2
+  become: yes 
+  vars_prompt: 
+     - name: xfs
+       prompt: what is the fstype name?
+       private: no
+     - name: homework
+       prompt: what is the path name?
+       private: no
+  tasks:
+    - name: create a 3 GB /dev/nvme0n2   partition
+      parted:
+        device: /dev/nvme0n2
+        number: 1
+        part_start: 3GiB
+        state: present
+
+    - name: Create a xfs filesystem on /dev/nvme0n2p1
+      community.general.filesystem:
+        fstype: xfs
+        dev: /dev/nvme0n2p1 
+
+    
+        
+    - name: Mount up device by UUID
+      mount:
+        path: homework
+        src:  /dev/nvme0n2p1
+        fstype: xfs
+        opts: noatime
+        state: mounted 
+  
